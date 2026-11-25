@@ -50,6 +50,13 @@ def main():
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8", newline="") as f:
         f.write(entry)
+    # Write round-trip verification: re-read the bytes we just wrote and
+    # fail loudly if they are not exactly the entry's UTF-8 encoding, so
+    # a truncated or re-encoded write can never pass silently.
+    with open("/output/entry.txt", "rb") as f:
+        written = f.read()
+    if written != entry.encode("utf-8"):
+        raise SystemExit("entry.txt write verification failed")
 
 
 if __name__ == "__main__":
